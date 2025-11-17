@@ -2,55 +2,69 @@
 {% block title %}Course Management{% endblock %}
 
 {% block content %}
-<h1>Course Management</h1>
+<div class="container mt-5">
+  <h1 class="mb-4">Course Management</h1>
 
-<h3>Create a New Course</h3>
-<form method="POST">
+  <h4>Create a New Course</h4>
+  <form method="POST" class="mb-5">
     {{ form.hidden_tag() }}
 
     <div class="mb-3">
-        {{ form.title.label(class="form-label") }}
-        {{ form.title(class="form-control") }}
+      {{ form.title.label(class="form-label") }}
+      {{ form.title(class="form-control") }}
     </div>
 
     <div class="mb-3">
-        {{ form.teacher.label(class="form-label") }}
-        {{ form.teacher(class="form-control") }}
+      {{ form.teacher.label(class="form-label") }}
+      {{ form.teacher(class="form-control") }}
     </div>
 
     <div class="mb-3">
-        {{ form.time.label(class="form-label") }}
-        {{ form.time(class="form-control") }}
+      {{ form.time.label(class="form-label") }}
+      {{ form.time(class="form-control") }}
     </div>
 
     <div class="mb-3">
-        {{ form.maxStudents.label(class="form-label") }}
-        {{ form.maxStudents(class="form-control") }}
+      {{ form.capacity.label(class="form-label") }}
+      {{ form.capacity(class="form-control") }}
     </div>
 
     {{ form.submit(class="btn btn-primary") }}
-</form>
+  </form>
 
-<hr>
+  <hr>
 
-<h3>Existing Courses</h3>
-<table class="table table-striped">
-    <tr>
+  <h4>Existing Courses</h4>
+  <table class="table table-bordered">
+    <thead class="table-light">
+      <tr>
         <th>Title</th>
         <th>Teacher</th>
         <th>Time</th>
-        <th>Current Students</th>
-        <th>Max Students</th>
-    </tr>
-    {% for c in courses %}
-    <tr>
-        <td>{{ c.Title }}</td>
-        <td>{{ c.Teacher }}</td>
-        <td>{{ c.Time }}</td>
-        <td>{{ c.currStudents }}</td>
-        <td>{{ c.maxStudents }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        <th>Capacity</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for course in courses %}
+      <tr>
+        <td>{{ course.title }}</td>
+        <td>{{ course.teacher }}</td>
+        <td>{{ course.time }}</td>
+        <td>{{ course.capacity }}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-secondary" onclick="openEditModal({{ course.id }}, '{{ course.title }}', '{{ course.teacher }}', '{{ course.time }}', {{ course.capacity }})">
+            Edit
+          </button>
+          <form action="{{ url_for('delete_course', course_id=course.id) }}" method="post" style="display:inline;">
+            <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('Are you sure?');">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
+{% include 'edit_modal.html' %}
 {% endblock %}

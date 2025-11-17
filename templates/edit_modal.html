@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div id="editModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h5 class="mb-3">Edit Course</h5>
+    <form method="POST" id="editCourseForm">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        <input type="text" name="title" id="editTitle" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <select name="teacher" id="editTeacher" class="form-control" required></select>
+      </div>
+      <div class="mb-3">
+        <input type="text" name="time" id="editTime" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <input type="number" name="capacity" id="editCapacity" class="form-control" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeEditModal()">Cancel</button>
+    </form>
+  </div>
+</div>

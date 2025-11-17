@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Edit Course: {{ course.title }}</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <p>{{ form.title.label }} {{ form.title(size=30) }}</p>
+    <p>{{ form.teacher.label }} {{ form.teacher() }}</p>
+    <p>{{ form.time.label }} {{ form.time(size=20) }}</p>
+    <p>{{ form.capacity.label }} {{ form.capacity() }}</p>
+    <p>{{ form.submit() }}</p>
+  </form>
+{% endblock %}

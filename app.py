@@ -1,8 +1,8 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
 from models import db, User, Course
-from forms import LoginForm, RegisterForm, newCourse
+from forms import LoginForm, RegisterForm, newCourse, EditCourseForm
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -118,16 +118,18 @@ def admin_edit_user(user_id):
     user = User.query.get_or_404(user_id)
     form = RegisterForm(obj=user)
 
-    if request.method == 'POST' and form.validate_on_submit():
+    if form.validate_on_submit():
         user.username = form.username.data
         user.email = form.email.data
-        user.password = form.password.data
+        if form.password.data:
+            user.password = form.password.data
         user.role = form.role.data
         db.session.commit()
         flash("User updated successfully.", "success")
-        return redirect(url_for('admin_users'))
+    else:
+        flash("Invalid form data", "danger")
 
-    return render_template('register.html', form=form, edit_mode=True)
+    return redirect(url_for('admin_users'))
 
 @app.route('/admin/users/delete/<int:user_id>')
 @login_required
@@ -154,39 +156,105 @@ def admin_courses():
         return redirect(url_for('login'))
     
     form = newCourse()
+
+    instructors = User.query.filter_by(role='instructor').all()
+    form.teacher.choices = [(instr.username, instr.username) for instr in instructors]
+
     if form.validate_on_submit():
         new_course = Course(
-            Title = form.title.data,
-            Teacher = form.teacher.data,
-            Time = form.time.data,
+            title = form.title.data,
+            teacher = form.teacher.data,
+            time = form.time.data,
             currStudents = 0,
-            maxStudents = form.maxStudents.data,
-            Students = {}
+            capacity = form.capacity.data,
+            students = {}
         )
         db.session.add(new_course)
         db.session.commit()
-        flash(f"Course '{new_course.Title}' created successfully.", 'success')
+        flash(f"Course '{new_course.title}' created successfully.", 'success')
         return redirect(url_for('admin_courses'))
     courses = Course.query.all()
     return render_template('course_management.html', courses=courses, form=form)
 
-# --------------------------
-# ADD COURSE (Placeholder)
-# --------------------------
-
-@app.route('/add-course')
+@app.route('/admin/edit_course/<int:course_id>', methods=['GET', 'POST'])
 @login_required
-def add_course():
-    if current_user.role != 'student':
-        flash('Access denied.', 'danger')
-        return redirect(url_for('login'))
-    return render_template('add_course.html')
+def edit_course(course_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('index'))
+
+    course = Course.query.get_or_404(course_id)
+    form = EditCourseForm()
+
+    # Populate dropdown
+    form.teacher.choices = [(user.username, user.username) for user in User.query.filter_by(role='instructor').all()]
+
+    if form.validate_on_submit():
+        course.title = form.title.data
+        course.teacher = form.teacher.data
+        course.time = form.time.data
+        course.capacity = form.capacity.data
+        db.session.commit()
+        return redirect(url_for('admin_courses'))
+
+    # Prefill form for GET
+    form.title.data = course.title
+    form.teacher.data = course.teacher
+    form.time.data = course.time
+    form.capacity.data = course.capacity
+
+    return render_template('edit_course.html', form=form, course=course)
+
+@app.route('/admin/delete_course/<int:course_id>', methods=['POST'])
+@login_required
+def delete_course(course_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('index'))
+
+    course = Course.query.get_or_404(course_id)
+    db.session.delete(course)
+    db.session.commit()
+    return redirect(url_for('admin_courses'))
+
+
+@app.route('/api/instructors')
+@login_required
+def get_instructors():
+    if current_user.role != 'admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    instructors = User.query.filter_by(role='instructor').all()
+    return jsonify([{'username': i.username} for i in instructors])
+
+@app.route('/admin/courses/<int:course_id>/update', methods=['POST'])
+@login_required
+def update_course(course_id):
+    data = request.get_json()
+    course = Course.query.get_or_404(course_id)
+
+    course.title = data.get("title", course.title)
+    course.teacher = data.get("teacher", course.teacher)
+    course.time = data.get("time", course.time)
+    course.capacity = data.get("capacity", course.capacity)
+
+    db.session.commit()
+    return jsonify({"success": True}), 200
 
 # --------------------------
 # Create tables
 # --------------------------
 with app.app_context():
     db.create_all()
+
+    if not User.query.filter_by(username="admin").first():
+        admin_user = User(
+            username="admin",
+            email="admin@ucmerced.edu",
+            password="admin123",
+            role="admin"
+        )
+        db.session.add(admin_user)
+        db.session.commit()
+        print("✅ Admin user created: admin / admin123")
 
 # --------------------------
 # RUN APP

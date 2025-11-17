@@ -13,9 +13,9 @@ class User(db.Model, UserMixin):
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    Title = db.Column(db.String(120),unique = True, nullable = False)
-    Teacher = db.Column(db.String(120),nullable = False)
-    Time = db.Column(db.String(120),nullable = False)
-    currStudents = db.Column(db.Integer,nullable = False)
-    maxStudents = db.Column(db.Integer,nullable = False)
-    Students = db.Column(db.JSON,nullable = False)
+    title = db.Column(db.String(120), unique=True, nullable=False)
+    teacher = db.Column(db.String(120), nullable=False)
+    time = db.Column(db.String(120), nullable=False)
+    currStudents = db.Column(db.Integer, nullable=False)
+    capacity = db.Column(db.Integer, nullable=False)
+    students = db.Column(db.JSON, nullable=False)

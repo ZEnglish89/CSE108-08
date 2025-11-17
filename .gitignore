@@ -1,1 +1,22 @@
+# Byte-compiled Python files
+__pycache__/
+*.pyc
+
+# Virtual environment
 venv/
+ENV/
+env/
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Instance folder (Flask config + database)
+instance/
+*.db
+
+# OS files
+.DS_Store
+
+# Flask/Werkzeug dumps
+*.log

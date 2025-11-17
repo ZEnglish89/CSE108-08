@@ -1,36 +1,36 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>User Management</h1>
+<div class="container mt-5">
+  <h1 class="mb-4">User Management</h1>
 
-<h2>Create New User</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <p>{{ form.username.label }} {{ form.username(size=20) }}</p>
-    <p>{{ form.email.label }} {{ form.email(size=40) }}</p>
-    <p>{{ form.password.label }} {{ form.password(size=20) }}</p>
-    <p>{{ form.role.label }} {{ form.role() }}</p>
-    <p>{{ form.submit() }}</p>
-</form>
+  <button class="btn btn-primary mb-3" onclick="openUserModal()">Create New User</button>
 
-<hr>
-
-<h2>All Users</h2>
-<table border="1">
-    <thead>
-        <tr><th>Username</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+  <table class="table table-bordered">
+    <thead class="table-light">
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
     </thead>
     <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.role }}</td>
-            <td>
-                <a href="{{ url_for('admin_edit_user', user_id=user.id) }}">Edit</a> |
-                <a href="{{ url_for('admin_delete_user', user_id=user.id) }}" onclick="return confirm('Are you sure?')">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
+      {% for user in users %}
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.role }}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-secondary"
+            onclick="openUserModal({{ user.id }}, '{{ user.username }}', '{{ user.email }}', '{{ user.role }}')">Edit</button>
+          <a href="{{ url_for('admin_delete_user', user_id=user.id) }}" onclick="return confirm('Are you sure?')"
+            class="btn btn-sm btn-outline-danger ms-2">Delete</a>
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+</div>
+
+{% include 'user_modal.html' %}
 {% endblock %}

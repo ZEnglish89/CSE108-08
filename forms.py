@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField
+from wtforms import StringField, IntegerField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Email
 
 class LoginForm(FlaskForm):
@@ -17,7 +17,14 @@ class RegisterForm(FlaskForm):
 
 class newCourse(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
-    teacher = StringField("Teacher",validators=[DataRequired()])
+    teacher = SelectField('Teacher', choices=[], validators=[DataRequired()])
     time = StringField("Time", validators=[DataRequired()])
-    maxStudents = StringField("Student Capacity", validators=[DataRequired()])
+    capacity = StringField("Student Capacity", validators=[DataRequired()])
     submit = SubmitField("Submit")
+
+class EditCourseForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    teacher = SelectField('Instructor', choices=[], validators=[DataRequired()])
+    time = StringField('Time', validators=[DataRequired()])
+    capacity = IntegerField('Capacity', validators=[DataRequired()])
+    submit = SubmitField('Update Course')
