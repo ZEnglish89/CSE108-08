@@ -240,6 +240,19 @@ def update_course(course_id):
     return jsonify({"success": True}), 200
 
 # --------------------------
+# Student Views
+# --------------------------
+@app.route('/add_course')
+@login_required
+def add_course():
+    if current_user.role != 'student':
+        flash("Access denied.", "danger")
+        return redirect(url_for('login'))
+
+    courses = Course.query.all()  # eventually filter out already-enrolled courses
+    return render_template('add_course.html', courses=courses)
+
+# --------------------------
 # Create tables
 # --------------------------
 with app.app_context():
