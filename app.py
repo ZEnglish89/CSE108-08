@@ -1,8 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
-from models import db, User
-from forms import LoginForm, RegisterForm
+from models import db, User, Course
+from forms import LoginForm, RegisterForm, newCourse
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -97,7 +97,8 @@ def admin_users():
             username=form.username.data,
             email=form.email.data,
             password=form.password.data,
-            role=form.role.data
+            role=form.role.data,
+#            classes = {}
         )
         db.session.add(new_user)
         db.session.commit()
@@ -140,6 +141,34 @@ def admin_delete_user(user_id):
     db.session.commit()
     flash("User deleted.", "info")
     return redirect(url_for('admin_users'))
+
+# --------------------------
+# COURSE MANAGEMENT (CRUD)
+# --------------------------
+
+@app.route('/admin/courses',methods = ["GET","POST"])
+@login_required
+def admin_courses():
+    if current_user.role != 'admin':
+        flash("Access denied.", "danger")
+        return redirect(url_for('login'))
+    
+    form = newCourse()
+    if form.validate_on_submit():
+        new_course = Course(
+            Title = form.Title.data,
+            Teacher = form.Teacher.data,
+            Time = form.Time.data,
+            currStudents = 0,
+            maxStudents = form.maxStudents.data,
+            Students = {}
+        )
+        db.session.add(new_course)
+        db.session.commit()
+        flash(f"Course '{new_course.Title}' created successfully.", 'success')
+        return redirect(url_for('admin_courses'))
+    courses = Course.query.all()
+    return render_template('course_management.html', courses=courses, form=form)
 
 # --------------------------
 # ADD COURSE (Placeholder)

@@ -14,3 +14,10 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     role = SelectField('Role', choices=[('student', 'Student'), ('instructor', 'Instructor'), ('admin', 'Admin')])
     submit = SubmitField('Submit')
+
+class newCourse(FlaskForm):
+    title = StringField("Title", validators=[DataRequired()])
+    teacher = StringField("Teacher",validators=[DataRequired()])
+    Time = StringField("Time", validators=[DataRequired()])
+    maxStudents = StringField("Student Capacity", validators=[DataRequired()])
+    submit = SubmitField("Submit")
