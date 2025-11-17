@@ -1,36 +1,56 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Course Management{% endblock %}
+
 {% block content %}
 <h1>Course Management</h1>
 
-<h2>Create New Course</h2>
+<h3>Create a New Course</h3>
 <form method="POST">
     {{ form.hidden_tag() }}
-    <p>{{ form.Title.label }} {{ form.Title(size=20) }}</p>
-    <p>{{ form.Teacher.label }} {{ form.Teacher(size=40) }}</p>
-    <p>{{ form.Time.label }} {{ form.Time(size=20) }}</p>
-    <p>{{ form.maxStudents.label }} {{ form.maxStudents() }}</p>
-    <p>{{ form.submit() }}</p>
+
+    <div class="mb-3">
+        {{ form.title.label(class="form-label") }}
+        {{ form.title(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.teacher.label(class="form-label") }}
+        {{ form.teacher(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.time.label(class="form-label") }}
+        {{ form.time(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.maxStudents.label(class="form-label") }}
+        {{ form.maxStudents(class="form-control") }}
+    </div>
+
+    {{ form.submit(class="btn btn-primary") }}
 </form>
 
 <hr>
 
-<h2>All Courses</h2>
-<table border="1">
-    <thead>
-        <tr><th>Title</th><th>Teacher</th><th>Time</th><th>Maximum Students</th></tr>
-    </thead>
-    <tbody>
-        {% for course in courses %}
-        <tr>
-            <td>{{ course.Title }}</td>
-            <td>{{ course.Teacher }}</td>
-            <td>{{ course.Time }}</td>
-            <td>
-                <a href="{{ url_for('admin_edit_course', course_id=course.id) }}">Edit</a> |
-                <a href="{{ url_for('admin_delete_course', course_id=course.id) }}" onclick="return confirm('Are you sure?')">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+<h3>Existing Courses</h3>
+<table class="table table-striped">
+    <tr>
+        <th>Title</th>
+        <th>Teacher</th>
+        <th>Time</th>
+        <th>Current Students</th>
+        <th>Max Students</th>
+    </tr>
+    {% for c in courses %}
+    <tr>
+        <td>{{ c.Title }}</td>
+        <td>{{ c.Teacher }}</td>
+        <td>{{ c.Time }}</td>
+        <td>{{ c.currStudents }}</td>
+        <td>{{ c.maxStudents }}</td>
+    </tr>
+    {% endfor %}
 </table>
+
 {% endblock %}

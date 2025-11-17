@@ -156,9 +156,9 @@ def admin_courses():
     form = newCourse()
     if form.validate_on_submit():
         new_course = Course(
-            Title = form.Title.data,
-            Teacher = form.Teacher.data,
-            Time = form.Time.data,
+            Title = form.title.data,
+            Teacher = form.teacher.data,
+            Time = form.time.data,
             currStudents = 0,
             maxStudents = form.maxStudents.data,
             Students = {}
