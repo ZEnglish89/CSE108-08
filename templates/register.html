@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Register New User{% endblock %}
+
+{% block content %}
+    <h2>Register New User</h2>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}
+        </p>
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=64) }}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=32) }}
+        </p>
+        <p>
+            {{ form.role.label }}<br>
+            {{ form.role() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
+    {% if edit_mode %}
+    <h2>Edit User</h2>
+    {% else %}
+    <h2>Register New User</h2>
+    {% endif %}
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.username.label }} {{ form.username(size=32) }}<br>
+        {{ form.email.label }} {{ form.email(size=32) }}<br>
+        {{ form.password.label }} {{ form.password(size=32) }}<br>
+        {{ form.role.label }} {{ form.role() }}<br>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}

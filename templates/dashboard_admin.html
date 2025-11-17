@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h1>Welcome, {{ current_user.username }} ({{ current_user.role.capitalize() }})</h1>
+<p>This is the admin dashboard. Features coming soon!</p>
+
+<p><a href="{{ url_for('admin_users') }}">User Management</a></p>
+{% endblock %}
