@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Course Management</h1>
+
+<h2>Create New Course</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>{{ form.Title.label }} {{ form.Title(size=20) }}</p>
+    <p>{{ form.Teacher.label }} {{ form.Teacher(size=40) }}</p>
+    <p>{{ form.Time.label }} {{ form.Time(size=20) }}</p>
+    <p>{{ form.maxStudents.label }} {{ form.maxStudents() }}</p>
+    <p>{{ form.submit() }}</p>
+</form>
+
+<hr>
+
+<h2>All Courses</h2>
+<table border="1">
+    <thead>
+        <tr><th>Title</th><th>Teacher</th><th>Time</th><th>Maximum Students</th></tr>
+    </thead>
+    <tbody>
+        {% for course in courses %}
+        <tr>
+            <td>{{ course.Title }}</td>
+            <td>{{ course.Teacher }}</td>
+            <td>{{ course.Time }}</td>
+            <td>
+                <a href="{{ url_for('admin_edit_course', course_id=course.id) }}">Edit</a> |
+                <a href="{{ url_for('admin_delete_course', course_id=course.id) }}" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
