@@ -42,6 +42,7 @@
         <th>Teacher</th>
         <th>Time</th>
         <th>Capacity</th>
+        <th>Enrolled</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -52,6 +53,7 @@
         <td>{{ course.teacher }}</td>
         <td>{{ course.time }}</td>
         <td>{{ course.capacity }}</td>
+        <td>{{ course.enrolled_students|length }}</td>
         <td>
           <button class="btn btn-sm btn-outline-secondary" onclick="openEditModal({{ course.id }}, '{{ course.title }}', '{{ course.teacher }}', '{{ course.time }}', {{ course.capacity }})">
             Edit

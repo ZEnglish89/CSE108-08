@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Available Courses{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Available Courses</h2>
+    <p>Browse and enroll in available courses.</p>
+
+    <div class="row">
+        {% for item in courses %}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.course.title }}</h5>
+                    <p class="card-text">
+                        <strong>Instructor:</strong> {{ item.course.teacher }}<br>
+                        <strong>Time:</strong> {{ item.course.time }}<br>
+                        <strong>Capacity:</strong> {{ item.enrolled_count }} / {{ item.course.capacity }}
+                    </p>
+                    
+                    {% if item.is_enrolled %}
+                        <span class="badge bg-success">Enrolled</span>
+                        <a href="{{ url_for('drop_course', course_id=item.course.id) }}" 
+                           class="btn btn-sm btn-outline-danger" 
+                           onclick="return confirm('Drop this course?')">
+                            Drop
+                        </a>
+                    {% elif item.has_space %}
+                        <a href="{{ url_for('enroll_course', course_id=item.course.id) }}" 
+                           class="btn btn-sm btn-primary">
+                            Enroll
+                        </a>
+                    {% else %}
+                        <span class="badge bg-danger">Full</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

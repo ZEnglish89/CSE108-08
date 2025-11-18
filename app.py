@@ -62,7 +62,9 @@ def dashboard_student():
     if current_user.role != 'student':
         flash('Access denied.', 'danger')
         return redirect(url_for('login'))
-    return render_template('dashboard_student.html')
+    
+    enrolled_courses = current_user.enrolled_courses
+    return render_template('dashboard_student.html', enrolled_courses=enrolled_courses)
 
 @app.route('/dashboard/instructor')
 @login_required
@@ -79,6 +81,77 @@ def dashboard_admin():
         flash('Access denied.', 'danger')
         return redirect(url_for('login'))
     return render_template('dashboard_admin.html')
+
+# --------------------------
+# STUDENT COURSE MANAGEMENT
+# --------------------------
+
+@app.route('/courses')
+@login_required
+def view_courses():
+    """View all available courses"""
+    if current_user.role != 'student':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('login'))
+    
+    courses = Course.query.all()
+    course_data = []
+    for course in courses:
+        enrolled_count = len(course.enrolled_students)
+        is_enrolled = current_user in course.enrolled_students
+        course_data.append({
+            'course': course,
+            'enrolled_count': enrolled_count,
+            'is_enrolled': is_enrolled,
+            'has_space': enrolled_count < course.capacity
+        })
+    
+    return render_template('view_courses.html', courses=course_data)
+
+
+@app.route('/enroll/<int:course_id>')
+@login_required
+def enroll_course(course_id):
+    """Enroll student in a course"""
+    if current_user.role != 'student':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('login'))
+    
+    course = Course.query.get_or_404(course_id)
+    enrolled_count = len(course.enrolled_students)
+    
+    if current_user in course.enrolled_students:
+        flash(f'You are already enrolled in {course.title}.', 'warning')
+        return redirect(url_for('view_courses'))
+    
+    if enrolled_count >= course.capacity:
+        flash(f'{course.title} is full. Cannot enroll.', 'danger')
+        return redirect(url_for('view_courses'))
+    
+    course.enrolled_students.append(current_user)
+    db.session.commit()
+    
+    flash(f'Successfully enrolled in {course.title}!', 'success')
+    return redirect(url_for('dashboard_student'))
+
+@app.route('/drop/<int:course_id>')
+@login_required
+def drop_course(course_id):
+    """Drop a course"""
+    if current_user.role != 'student':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('login'))
+    
+    course = Course.query.get_or_404(course_id)
+    
+    if current_user in course.enrolled_students:
+        course.enrolled_students.remove(current_user)
+        db.session.commit()
+        flash(f'Dropped {course.title}.', 'info')
+    else:
+        flash('You are not enrolled in this course.', 'warning')
+    
+    return redirect(url_for('dashboard_student'))
 
 # --------------------------
 # USER MANAGEMENT (CRUD)
@@ -98,7 +171,6 @@ def admin_users():
             email=form.email.data,
             password=form.password.data,
             role=form.role.data,
-#            classes = {}
         )
         db.session.add(new_user)
         db.session.commit()
@@ -165,9 +237,7 @@ def admin_courses():
             title = form.title.data,
             teacher = form.teacher.data,
             time = form.time.data,
-            currStudents = 0,
             capacity = form.capacity.data,
-            students = {}
         )
         db.session.add(new_course)
         db.session.commit()
@@ -196,7 +266,6 @@ def edit_course(course_id):
         db.session.commit()
         return redirect(url_for('admin_courses'))
 
-    # Prefill form for GET
     form.title.data = course.title
     form.teacher.data = course.teacher
     form.time.data = course.time
@@ -240,24 +309,12 @@ def update_course(course_id):
     return jsonify({"success": True}), 200
 
 # --------------------------
-# Student Views
-# --------------------------
-@app.route('/add_course')
-@login_required
-def add_course():
-    if current_user.role != 'student':
-        flash("Access denied.", "danger")
-        return redirect(url_for('login'))
-
-    courses = Course.query.all()  # eventually filter out already-enrolled courses
-    return render_template('add_course.html', courses=courses)
-
-# --------------------------
-# Create tables
+# Create tables and sample data
 # --------------------------
 with app.app_context():
     db.create_all()
 
+    # Create admin user if it doesn't exist
     if not User.query.filter_by(username="admin").first():
         admin_user = User(
             username="admin",
@@ -267,7 +324,40 @@ with app.app_context():
         )
         db.session.add(admin_user)
         db.session.commit()
-        print("✅ Admin user created: admin / admin123")
+        print("Admin user created: admin / admin123")
+
+    # Create some sample instructors and courses
+    if not User.query.filter_by(username="instructor").first():
+        instructor_user = User(
+            username="instructor",
+            email="instructor@ucmerced.edu",
+            password="instructor123",
+            role="instructor"
+        )
+        db.session.add(instructor_user)
+        
+        # Create sample student
+        student_user = User(
+            username="student",
+            email="student@ucmerced.edu", 
+            password="student123",
+            role="student"
+        )
+        db.session.add(student_user)
+        
+        # Create sample courses
+        if not Course.query.first():
+            sample_courses = [
+                Course(title="Math 101", teacher="instructor", time="MWF 10:00-10:50 AM", capacity=30),
+                Course(title="Physics 121", teacher="instructor", time="TR 11:00-11:50 AM", capacity=25),
+                Course(title="CSE 106", teacher="instructor", time="MWF 2:00-2:50 PM", capacity=20),
+                Course(title="CSE 162", teacher="instructor", time="TR 3:00-3:50 PM", capacity=15),
+            ]
+            for course in sample_courses:
+                db.session.add(course)
+        
+        db.session.commit()
+        print("Sample users and courses created")
 
 # --------------------------
 # RUN APP
