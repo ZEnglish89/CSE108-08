@@ -315,10 +315,23 @@ def update_course(course_id):
 @app.route('/admin/courses/<int:course_id>/grades',methods = ['GET','POST'])
 @login_required
 def course_grades(course_id):
+    if not (current_user.role == 'admin' or current_user.role == 'instructor'):
+        flash("Access denied.", "danger")
+        return redirect(url_for('login'))
     course = Course.query.get_or_404(course_id)
     students = course.enrolled_students
     
     return render_template('grade_management.html',course = course,students = students)
+
+@app.route('/instructor/courses',methods = ['GET','POST'])
+@login_required
+def instructor_courses():
+    if current_user.role != 'instructor':
+        flash("Access denied.", "danger")
+        return redirect(url_for('login'))
+    courses = Course.query.filter_by(teacher = current_user.username).all()
+
+    return render_template('course_list.html',courses = courses)
 
 # --------------------------
 # Create tables and sample data

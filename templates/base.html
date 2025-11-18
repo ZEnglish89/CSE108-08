@@ -34,7 +34,10 @@
                         </li>
                     {% elif current_user.role == 'instructor' %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('dashboard_instructor') }}">Your Courses</a>
+                            <a class="nav-link" href="{{ url_for('dashboard_instructor') }}">Dashboard</a>
+                        </li>
+                        <li class = "nav-item">
+                            <a class="nav-link" href="{{ url_for('instructor_courses') }}">Your Courses</a>
                         </li>
                     {% elif current_user.role == 'admin' %}
                         <li class="nav-item">

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Course List{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">Course List</h1>
+
+  <table class="table table-bordered">
+    <thead class="table-light">
+      <tr>
+        <th>Title</th>
+        <th>Teacher</th>
+        <th>Time</th>
+        <th>Capacity</th>
+        <th>Enrolled</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for course in courses %}
+      <tr>
+        <td>
+          <a href = "{{ url_for('course_grades',course_id = course.id) }}">{{course.title}}</a>
+        </td>
+        <td>{{ course.teacher }}</td>
+        <td>{{ course.time }}</td>
+        <td>{{ course.capacity }}</td>
+        <td>{{ course.enrolled_students|length }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

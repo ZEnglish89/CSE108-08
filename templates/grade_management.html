@@ -12,6 +12,7 @@
             <tr>
                 <th>Student Name</th>
                 <th>Grade</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -19,6 +20,7 @@
             <tr>
                 <td>{{ student.username }}</td>
                 <td>{{ student.grade }}</td>
+                <td><button class = "btn btn-sm btn-outline-secondary">Edit</button></td>
             </tr>
             {% endfor %}
         </tbody>
