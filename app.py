@@ -314,28 +314,6 @@ def update_course(course_id):
 
 @app.route('/admin/courses/<int:course_id>/grades',methods = ['GET','POST'])
 @login_required
-# def course_grades(course_id):
-#     if not (current_user.role == 'admin' or current_user.role == 'instructor'):
-#         flash("Access denied.", "danger")
-#         return redirect(url_for('login'))
-#     course = Course.query.get_or_404(course_id)
-#
-#     students = []
-#
-#     for student in course.enrolled_students:
-#         link = db.session.execute(
-#             enrollments.select().where(
-#                 enrollments.c.student_id == student.id,
-#                 enrollments.c.course_id == course.id
-#             )
-#         ).fetchone()
-#
-#         students.append({
-#             "user": student,
-#             "grade": link.grade if link else 0
-#         })
-#
-#     return render_template("grade_management.html", course=course, students=students)
 def course_grades(course_id):
     if not (current_user.role == 'admin' or current_user.role == 'instructor'):
         flash("Access denied.", "danger")

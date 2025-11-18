@@ -1,9 +1,40 @@
 {% extends "base.html" %}
 {% block title %}Admin Dashboard{% endblock %}
-{% block content %}
-<h1>Welcome, {{ current_user.username }} ({{ current_user.role.capitalize() }})</h1>
-<p>This is the admin dashboard. Features coming soon!</p>
 
-<p><a href="{{ url_for('admin_users') }}">User Management</a></p>
-<p><a href="{{ url_for('admin_courses') }}">Course Management</a></p>
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Welcome, {{ current_user.username }} (Admin)</h2>
+
+    <div class="row text-center">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title">User Management</h5>
+                    <p class="card-text">View, create, or delete users. Assign roles and manage access.</p>
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-primary mt-2">Go</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Course Management</h5>
+                    <p class="card-text">Create or edit courses, assign instructors, manage availability.</p>
+                    <a href="{{ url_for('admin_courses') }}" class="btn btn-primary mt-2">Go</a>
+                </div>
+            </div>
+        </div>
+
+{#        <div class="col-md-4 mb-3">#}
+{#            <div class="card shadow-sm h-100">#}
+{#                <div class="card-body d-flex flex-column justify-content-between">#}
+{#                    <h5 class="card-title">Grades & Enrollment</h5>#}
+{#                    <p class="card-text">Manually enroll students and update their course grades.</p>#}
+{#                    <a href="{{ url_for('edit_grade') }}" class="btn btn-primary mt-2">Go</a>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+    </div>
+</div>
 {% endblock %}

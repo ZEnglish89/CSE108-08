@@ -2,7 +2,16 @@
 {% block title %}Instructor Dashboard{% endblock %}
 {% block content %}
 <h2>Welcome, {{ current_user.username }} (Instructor)</h2>
-<p>This is the instructor dashboard. Features coming soon!</p>
 
-<p><a href = "{{ url_for('instructor_courses')}}">Course List</a></p>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card text-center">
+            <div class="card-body">
+                <h4 class="card-title">Your Courses</h4>
+                <p class="card-text">View the courses you're assigned to. Manage content and student information.</p>
+                <a href="{{ url_for('instructor_courses') }}" class="btn btn-primary px-5 py-2">Go</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
