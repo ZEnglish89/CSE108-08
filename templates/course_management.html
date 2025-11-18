@@ -49,7 +49,9 @@
     <tbody>
       {% for course in courses %}
       <tr>
-        <td>{{ course.title }}</td>
+        <td>
+          <a href = "{{ url_for('course_grades',course_id = course.id) }}">{{course.title}}</a>
+        </td>
         <td>{{ course.teacher }}</td>
         <td>{{ course.time }}</td>
         <td>{{ course.capacity }}</td>

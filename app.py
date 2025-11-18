@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
-from models import db, User, Course
+from models import db, User, Course, enrollments
 from forms import LoginForm, RegisterForm, newCourse, EditCourseForm
 
 app = Flask(__name__)
@@ -307,6 +307,18 @@ def update_course(course_id):
 
     db.session.commit()
     return jsonify({"success": True}), 200
+
+# --------------------------
+# Grade Management
+# --------------------------
+
+@app.route('/admin/courses/<int:course_id>/grades',methods = ['GET','POST'])
+@login_required
+def course_grades(course_id):
+    course = Course.query.get_or_404(course_id)
+    students = course.enrolled_students
+    
+    return render_template('grade_management.html',course = course,students = students)
 
 # --------------------------
 # Create tables and sample data

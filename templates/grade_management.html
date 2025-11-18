@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %} Grade Management {% endblock %}
+
+{% block content %}
+
+<div class = "container mt-5">
+    <h1 class = "mb-4">{{course.title}}</h1>
+
+    <h4>Enrolled Students</h4>
+    <table class = "table table-bordered">
+        <thead class = "table-light">
+            <tr>
+                <th>Student Name</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in course.enrolled_students %}
+            <tr>
+                <td>{{ student.username }}</td>
+                <td>{{ student.grade }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% endblock %}
