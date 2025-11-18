@@ -314,14 +314,72 @@ def update_course(course_id):
 
 @app.route('/admin/courses/<int:course_id>/grades',methods = ['GET','POST'])
 @login_required
+# def course_grades(course_id):
+#     if not (current_user.role == 'admin' or current_user.role == 'instructor'):
+#         flash("Access denied.", "danger")
+#         return redirect(url_for('login'))
+#     course = Course.query.get_or_404(course_id)
+#
+#     students = []
+#
+#     for student in course.enrolled_students:
+#         link = db.session.execute(
+#             enrollments.select().where(
+#                 enrollments.c.student_id == student.id,
+#                 enrollments.c.course_id == course.id
+#             )
+#         ).fetchone()
+#
+#         students.append({
+#             "user": student,
+#             "grade": link.grade if link else 0
+#         })
+#
+#     return render_template("grade_management.html", course=course, students=students)
 def course_grades(course_id):
     if not (current_user.role == 'admin' or current_user.role == 'instructor'):
         flash("Access denied.", "danger")
         return redirect(url_for('login'))
-    course = Course.query.get_or_404(course_id)
 
+    course = Course.query.get_or_404(course_id)
     students = []
 
+    # Handle Add Student
+    if request.method == 'POST':
+        if 'add_student' in request.form:
+            student_id = int(request.form.get('student_id'))
+            existing = db.session.execute(
+                enrollments.select().where(
+                    enrollments.c.student_id == student_id,
+                    enrollments.c.course_id == course.id
+                )
+            ).fetchone()
+
+            if not existing:
+                db.session.execute(
+                    enrollments.insert().values(
+                        student_id=student_id,
+                        course_id=course.id,
+                        grade=0
+                    )
+                )
+                db.session.commit()
+                flash("Student enrolled successfully!", "success")
+                return redirect(url_for('course_grades', course_id=course.id))
+
+        elif 'remove_student' in request.form:
+            student_id = int(request.form.get('remove_student'))
+            db.session.execute(
+                enrollments.delete().where(
+                    enrollments.c.student_id == student_id,
+                    enrollments.c.course_id == course.id
+                )
+            )
+            db.session.commit()
+            flash("Student removed from course.", "success")
+            return redirect(url_for('course_grades', course_id=course.id))
+
+    # Display currently enrolled students
     for student in course.enrolled_students:
         link = db.session.execute(
             enrollments.select().where(
@@ -329,17 +387,22 @@ def course_grades(course_id):
                 enrollments.c.course_id == course.id
             )
         ).fetchone()
-
         students.append({
             "user": student,
             "grade": link.grade if link else 0
         })
 
-    return render_template("grade_management.html", course=course, students=students)
+    # Get students NOT in this course
+    enrolled_ids = [student.id for student in course.enrolled_students]
+    available_students = User.query.filter(
+        User.role == 'student',
+        ~User.id.in_(enrolled_ids)
+    ).all()
 
-    # students = course.enrolled_students
-    #
-    # return render_template('grade_management.html',course = course,students = students)
+    return render_template("grade_management.html",
+                           course=course,
+                           students=students,
+                           available_students=available_students)
 
 @app.route('/courses/<int:course_id>/grade/<int:student_id>', methods=['GET', 'POST'])
 @login_required

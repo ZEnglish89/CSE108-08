@@ -1,14 +1,51 @@
+{#{% extends "base.html" %}#}
+{#{% block title %} Grade Management {% endblock %}#}
+{##}
+{#{% block content %}#}
+{##}
+{#<div class = "container mt-5">#}
+{#    <h1 class = "mb-4">{{course.title}}</h1>#}
+{##}
+{#    <h4>Enrolled Students</h4>#}
+{#    <table class = "table table-bordered">#}
+{#        <thead class = "table-light">#}
+{#            <tr>#}
+{#                <th>Student Name</th>#}
+{#                <th>Grade</th>#}
+{#                <th>Actions</th>#}
+{#            </tr>#}
+{#        </thead>#}
+{#        <tbody>#}
+{#              {% for s in students %}#}
+{#                <tr>#}
+{#                    <td>{{ s.user.username }}</td>#}
+{#                    <td>{{ s.grade }}</td>#}
+{#                    <td>#}
+{#                        <a href="{{ url_for('edit_grade', course_id=course.id, student_id=s.user.id) }}"#}
+{#                           class="btn btn-sm btn-outline-secondary">#}
+{#                           Edit#}
+{#                        </a>#}
+{#                    </td>#}
+{#                </tr>#}
+{#              {% endfor %}#}
+{#        </tbody>#}
+{##}
+{#    </table>#}
+{#</div>#}
+{##}
+{#{% endblock %}#}
+
 {% extends "base.html" %}
 {% block title %} Grade Management {% endblock %}
 
 {% block content %}
 
-<div class = "container mt-5">
-    <h1 class = "mb-4">{{course.title}}</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">{{ course.title }}</h1>
 
     <h4>Enrolled Students</h4>
-    <table class = "table table-bordered">
-        <thead class = "table-light">
+    <table class="table table-bordered">
+        <thead class="table-light">
             <tr>
                 <th>Student Name</th>
                 <th>Grade</th>
@@ -16,28 +53,44 @@
             </tr>
         </thead>
         <tbody>
-              {% for s in students %}
-                <tr>
-                    <td>{{ s.user.username }}</td>
-                    <td>{{ s.grade }}</td>
-                    <td>
-                        <a href="{{ url_for('edit_grade', course_id=course.id, student_id=s.user.id) }}"
-                           class="btn btn-sm btn-outline-secondary">
-                           Edit
-                        </a>
-                    </td>
-                </tr>
-              {% endfor %}
-{#            {% for student in course.enrolled_students %}#}
-{#            <tr>#}
-{#                <td>{{ student.username }}</td>#}
-{#                <td>{{ student.grade }}</td>#}
-{#                <td><button class = "btn btn-sm btn-outline-secondary">Edit</button></td>#}
-{#            </tr>#}
-{#            {% endfor %}#}
-        </tbody>
+            {% for s in students %}
+            <tr>
+                <td>{{ s.user.username }}</td>
+                <td>{{ s.grade }}</td>
+                <td>
+                    <a href="{{ url_for('edit_grade', course_id=course.id, student_id=s.user.id) }}"
+                       class="btn btn-sm btn-outline-secondary">
+                        Edit
+                    </a>
 
+                    {% if current_user.role == 'admin' %}
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="remove_student" value="{{ s.user.id }}">
+                        <button type="submit" class="btn btn-sm btn-danger ms-2">Remove</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
+
+    {% if current_user.role == 'admin' %}
+    <hr>
+
+    <h4>Enroll a New Student</h4>
+    <form method="POST" class="mb-4">
+        <div class="mb-3">
+            <label for="student_id" class="form-label">Select Student</label>
+            <select name="student_id" id="student_id" class="form-control" required>
+                {% for student in available_students %}
+                <option value="{{ student.id }}">{{ student.username }} ({{ student.email }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" name="add_student" class="btn btn-success">Add Student</button>
+    </form>
+    {% endif %}
 </div>
 
 {% endblock %}
