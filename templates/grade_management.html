@@ -16,13 +16,25 @@
             </tr>
         </thead>
         <tbody>
-            {% for student in course.enrolled_students %}
-            <tr>
-                <td>{{ student.username }}</td>
-                <td>{{ student.grade }}</td>
-                <td><button class = "btn btn-sm btn-outline-secondary">Edit</button></td>
-            </tr>
-            {% endfor %}
+              {% for s in students %}
+                <tr>
+                    <td>{{ s.user.username }}</td>
+                    <td>{{ s.grade }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_grade', course_id=course.id, student_id=s.user.id) }}"
+                           class="btn btn-sm btn-outline-secondary">
+                           Edit
+                        </a>
+                    </td>
+                </tr>
+              {% endfor %}
+{#            {% for student in course.enrolled_students %}#}
+{#            <tr>#}
+{#                <td>{{ student.username }}</td>#}
+{#                <td>{{ student.grade }}</td>#}
+{#                <td><button class = "btn btn-sm btn-outline-secondary">Edit</button></td>#}
+{#            </tr>#}
+{#            {% endfor %}#}
         </tbody>
 
     </table>

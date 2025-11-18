@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Edit Grade for {{ student.username }}</h2>
+
+<form method="POST">
+    <div class="mb-3">
+        <label class="form-label">Grade</label>
+        <input name="grade" type="number" class="form-control" value="{{ grade }}">
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-secondary" href="{{ url_for('course_grades', course_id=course.id) }}">Cancel</a>
+</form>
+
+{% endblock %}

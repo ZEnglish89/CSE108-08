@@ -319,9 +319,63 @@ def course_grades(course_id):
         flash("Access denied.", "danger")
         return redirect(url_for('login'))
     course = Course.query.get_or_404(course_id)
-    students = course.enrolled_students
-    
-    return render_template('grade_management.html',course = course,students = students)
+
+    students = []
+
+    for student in course.enrolled_students:
+        link = db.session.execute(
+            enrollments.select().where(
+                enrollments.c.student_id == student.id,
+                enrollments.c.course_id == course.id
+            )
+        ).fetchone()
+
+        students.append({
+            "user": student,
+            "grade": link.grade if link else 0
+        })
+
+    return render_template("grade_management.html", course=course, students=students)
+
+    # students = course.enrolled_students
+    #
+    # return render_template('grade_management.html',course = course,students = students)
+
+@app.route('/courses/<int:course_id>/grade/<int:student_id>', methods=['GET', 'POST'])
+@login_required
+def edit_grade(course_id, student_id):
+    if current_user.role not in ['admin', 'instructor']:
+        flash("Access denied.", "danger")
+        return redirect(url_for('login'))
+
+    course = Course.query.get_or_404(course_id)
+    student = User.query.get_or_404(student_id)
+
+    link = db.session.execute(
+        enrollments.select().where(
+            enrollments.c.student_id == student_id,
+            enrollments.c.course_id == course_id
+        )
+    ).fetchone()
+
+    grade = link.grade if link else 0
+
+    if request.method == 'POST':
+        new_grade = int(request.form['grade'])
+        db.session.execute(
+            enrollments.update().where(
+                enrollments.c.student_id == student_id,
+                enrollments.c.course_id == course_id
+            ).values(grade=new_grade)
+        )
+        db.session.commit()
+        flash("Grade updated!", "success")
+        return redirect(url_for('course_grades', course_id=course_id))
+
+    return render_template("edit_grade.html",
+                           course=course,
+                           student=student,
+                           grade=grade)
 
 @app.route('/instructor/courses',methods = ['GET','POST'])
 @login_required
